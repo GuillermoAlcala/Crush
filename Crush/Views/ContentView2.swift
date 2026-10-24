@@ -75,7 +75,7 @@ struct ContentView2: View {
                 sheet.destinationsView
                 
             }
-            .navigationTitle("Crush")
+            .navigationTitle("helados")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
