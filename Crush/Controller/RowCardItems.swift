@@ -45,7 +45,7 @@ struct RowCard: View {
     @State private var selectTypePaleta : ModelList.Paletas = .agua
     
     @State private var selectTypeFrappe: ModelList.TamanoFrappe = .normal
-    
+    @State private var isDisabled: Bool = false
 
     var body: some View {
         HStack(alignment: .center, spacing: 12){
@@ -165,6 +165,7 @@ struct RowCard: View {
             .pickerStyle(.menu)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
+            .disabled(productName == .paletas && selectTypePaleta == .crema)
         } else {
             Picker("", selection: $selectecTypeToppingsLiquidos){
                 ForEach(ModelList.Toppings.SaboresLiquidos.allCases, id: \.self) { topping in
@@ -179,14 +180,21 @@ struct RowCard: View {
 
     @ViewBuilder 
     var DryToppingsPicker: some View {
-        Picker("", selection: $selectecTypeToppingsSecos){
-            ForEach(ModelList.Toppings.SaboresSecos.allCases, id: \.self) { secos in
-                Text(secos.rawValue).tag(secos)
+            Picker("", selection: $selectecTypeToppingsSecos){
+                ForEach(ModelList.Toppings.SaboresSecos.allCases, id: \.self) { secos in
+                    Text(secos.rawValue).tag(secos)
+                }
+                
             }
-        }
+        
         .pickerStyle(.menu)
         .lineLimit(1)
         .minimumScaleFactor(0.8)
+        .disabled(productName == .paletas && selectTypePaleta == .agua)
+
+
+             
+        
     }
 }
 #Preview {

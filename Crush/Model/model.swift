@@ -136,7 +136,7 @@ class ModelList{
         enum ToppingsPaletasAgua: String, CaseIterable, Identifiable{
             case gomitas = "Gomitas"
             case chamoy = "Chamoy"
-            case tajin = "Tajin"
+            case tajin = "Valentina"
             
             var id: Self{self}
         }
