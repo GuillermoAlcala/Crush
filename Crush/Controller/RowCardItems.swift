@@ -39,7 +39,7 @@ struct RowCard: View {
     let action : () -> Void
     @State private var selectedType: ModelList.TiposWaffle = .sencillo
     @State private var selectecTypeToppingsLiquidos: ModelList.Toppings.SaboresLiquidos = .cajeta
-    @State private var selectecTypeToppingsSecos: ModelList.Toppings.SaboresSecos = .almendra
+    @State private var selectecTypeToppingsSecos: ModelList.Toppings.SaboresSecos = .ninguno
     
     @State private var selectecPaletaToppingLiquidi: ModelList.Paletas.ToppingsPaletasAgua = .chamoy
     @State private var selectTypePaleta : ModelList.Paletas = .agua
@@ -47,6 +47,22 @@ struct RowCard: View {
     @State private var selectTypeFrappe: ModelList.TamanoFrappe = .normal
     @State private var isDisabled: Bool = false
 
+    //Exceptio cuando la paleta sea agua y seleccione sabores secos
+    private var toppingsSecosDisponibles: [ModelList.Toppings.SaboresSecos] {
+        if productName == .paletas && selectTypePaleta == .agua {
+            return [.panditas, .gomitas, .manguitos, .ninguno]
+        }
+        return ModelList.Toppings.SaboresSecos.allCases
+    }
+    
+    //Exceptio cuando la paleta sea crema y seleccione sabores líquidos
+    private var toppingsLiquidosDisponibles: [ModelList.Toppings.SaboresLiquidos] {
+        if productName == .paletas && selectTypePaleta == .crema {
+            return [.nutella,.mermelada,.lechera,.cajeta,.ninguno]
+        }
+        return ModelList.Toppings.SaboresLiquidos.allCases
+    }
+    
     var body: some View {
         HStack(alignment: .center, spacing: 12){
             Button(action:action){
@@ -156,7 +172,7 @@ struct RowCard: View {
     
     @ViewBuilder
     var LiquidToppingsPicker: some View {
-        if productName == .paletas {
+        if productName == .paletas && selectTypePaleta == .agua {
             Picker("", selection: $selectecPaletaToppingLiquidi){
                 ForEach(ModelList.Paletas.ToppingsPaletasAgua.allCases, id: \.self) { paletaL in
                     Text(paletaL.rawValue).tag(paletaL)
@@ -165,36 +181,47 @@ struct RowCard: View {
             .pickerStyle(.menu)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
-            .disabled(productName == .paletas && selectTypePaleta == .crema)
+          //  .disabled(productName == .paletas && selectTypePaleta == .crema)
+            
         } else {
             Picker("", selection: $selectecTypeToppingsLiquidos){
-                ForEach(ModelList.Toppings.SaboresLiquidos.allCases, id: \.self) { topping in
+                ForEach(toppingsLiquidosDisponibles, id: \.self) { topping in
                     Text(topping.rawValue).tag(topping)
                 }
             }
             .pickerStyle(.menu)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
+            // Recalibra la selección al cambiar a Paleta de Crema si el sabor actual no está en la lista reducida
+                    .onChange(of: selectTypePaleta) { _, newType in
+                        if productName == .paletas && newType == .crema {
+                            if !toppingsLiquidosDisponibles.contains(selectecTypeToppingsLiquidos) {
+                                selectecTypeToppingsLiquidos = .cajeta
+                            }
+                        }
+                    }
         }
     }
 
-    @ViewBuilder 
+    @ViewBuilder
     var DryToppingsPicker: some View {
-            Picker("", selection: $selectecTypeToppingsSecos){
-                ForEach(ModelList.Toppings.SaboresSecos.allCases, id: \.self) { secos in
-                    Text(secos.rawValue).tag(secos)
-                }
-                
+        Picker("", selection: $selectecTypeToppingsSecos) {
+            ForEach(toppingsSecosDisponibles, id: \.self) { secos in
+                Text(secos.rawValue).tag(secos)
             }
-        
+        }
         .pickerStyle(.menu)
         .lineLimit(1)
         .minimumScaleFactor(0.8)
-        .disabled(productName == .paletas && selectTypePaleta == .agua)
-
-
-             
-        
+        // Se recalibra la opción seleccionada al cambiar a Paleta de Agua
+        .onChange(of: selectTypePaleta){ _, new in
+            if productName == .paletas && new == .agua{
+                if !toppingsSecosDisponibles.contains(selectecTypeToppingsSecos) {
+                    selectecTypeToppingsSecos = .panditas
+                            }
+            }
+            
+        }
     }
 }
 #Preview {
@@ -221,3 +248,23 @@ struct RowCard: View {
 
 
 
+/*
+ // Propiedad computada para evaluar si debe bloquearse
+ private var esPaletaDeAgua: Bool {
+     productName == .paleta && selectTypePaleta == .agua
+ }
+
+ @ViewBuilder
+ var DryToppingsPicker: some View {
+     Picker("", selection: $selectecTypeToppingsSecos) {
+         ForEach(ModelList.Toppings.SaboresSecos.allCases, id: \.self) { secos in
+             Text(secos.rawValue).tag(secos)
+         }
+     }
+     .pickerStyle(.menu)
+     .lineLimit(1)
+     .minimumScaleFactor(0.8)
+     // ✏️ Bloquea únicamente las Paletas de Agua
+     .disabled(esPaletaDeAgua)
+ }
+ */

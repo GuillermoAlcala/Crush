@@ -103,7 +103,11 @@ class ModelList{
             case emanens = "m&m"
             case kranquis = "Kranquis"
             case chocoretas = "Chocoretas"
+            case panditas = "Panditas"
+            case gomitas = "Gomitas"
+            case manguitos = "Manguitos"
             case ninguno = "Ninguno"
+            
             var id: Self{self}
         }
         
@@ -134,7 +138,6 @@ class ModelList{
         }
         
         enum ToppingsPaletasAgua: String, CaseIterable, Identifiable{
-            case gomitas = "Gomitas"
             case chamoy = "Chamoy"
             case tajin = "Valentina"
             
