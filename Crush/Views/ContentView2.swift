@@ -25,11 +25,19 @@ struct ContentView2: View {
                          width: 150,heigth: 150)]
     
     let newModel = [
-        RowModelCard(productName: .frappes, img: .píxel,isSheet: .frappe,
+        RowModelCard(productName: .frappes,
+                     img: .píxel,
+                     isSheet: .frappe,
                      width: 110,height: 110),
-        RowModelCard(productName: .paletas, img: .paletas,isSheet: .paletas,
+        
+        RowModelCard(productName: .paletas,
+                     img: .paletas,
+                     isSheet: .paletas,
                      width: 110,height: 110),
-        RowModelCard(productName: .waffles, img: .waffleSencillo,isSheet: .waffles,
+        
+        RowModelCard(productName: .waffles,
+                     img: .wafflefresa,
+                     isSheet: .waffles,
                      width: 110,height: 110)
     ]
     
@@ -75,7 +83,7 @@ struct ContentView2: View {
                 sheet.destinationsView
                 
             }
-            .navigationTitle("helados")
+            .navigationTitle("Crush")
             .navigationBarTitleDisplayMode(.inline)
         }
     }

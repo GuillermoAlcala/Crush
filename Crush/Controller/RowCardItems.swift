@@ -38,7 +38,7 @@ struct RowCard: View {
     let height: CGFloat
     let action : () -> Void
     @State private var selectedType: ModelList.TiposWaffle = .sencillo
-    @State private var selectecTypeToppingsLiquidos: ModelList.Toppings.SaboresLiquidos = .cajeta
+    @State private var selectecTypeToppingsLiquidos: ModelList.Toppings.SaboresLiquidos = .ninguno
     @State private var selectecTypeToppingsSecos: ModelList.Toppings.SaboresSecos = .ninguno
     
     @State private var selectecPaletaToppingLiquidi: ModelList.Paletas.ToppingsPaletasAgua = .chamoy
@@ -46,14 +46,6 @@ struct RowCard: View {
     
     @State private var selectTypeFrappe: ModelList.TamanoFrappe = .normal
     @State private var isDisabled: Bool = false
-
-    //Exceptio cuando la paleta sea agua y seleccione sabores secos
-    private var toppingsSecosDisponibles: [ModelList.Toppings.SaboresSecos] {
-        if productName == .paletas && selectTypePaleta == .agua {
-            return [.panditas, .gomitas, .manguitos, .ninguno]
-        }
-        return ModelList.Toppings.SaboresSecos.allCases
-    }
     
     //Exceptio cuando la paleta sea crema y seleccione sabores líquidos
     private var toppingsLiquidosDisponibles: [ModelList.Toppings.SaboresLiquidos] {
@@ -62,6 +54,59 @@ struct RowCard: View {
         }
         return ModelList.Toppings.SaboresLiquidos.allCases
     }
+    
+    
+    //Exceptio cuando la paleta sea agua y seleccione sabores secos
+    private var toppingsSecosDisponibles: [ModelList.Toppings.SaboresSecos] {
+        if productName == .paletas && selectTypePaleta == .agua {
+            return [.panditas, .gomitas, .manguitos, .ninguno]
+        }
+        return ModelList.Toppings.SaboresSecos.allCases
+    }
+    
+    //MARK: - EXCEPTION: CUANDO LA PALETA SEA DE CREMA: QUITAR LOS SIGUIENTES TOPPINGS: panditas, gomitas, manguitos
+//    private var test_ExcludeToppingsSecosPaletaCrema: [ModelList.Toppings.SaboresSecos]{
+//        
+//        //1.- Condiciono solo para paletas y tipo crema
+//        if productName == .paletas && selectTypePaleta == .crema{
+//            
+//        //2.- Creo el set(conjunto) para la búsqueda de los toppings
+//            let exclude: Set<ModelList.Toppings.SaboresSecos> = [
+//                .panditas,
+//                .gomitas,
+//                .manguitos]
+//        //3.- Devuelvo el arreglo, filtrándolo y excluyendo lo que contiene: "exclude"
+//            return ModelList.Toppings.SaboresSecos.allCases.filter{
+//                !exclude.contains($0)
+//            }
+//
+//        }
+//        // 4.- Regreso la lista de Toppings Secos ya filtrada
+//        return ModelList.Toppings.SaboresSecos.allCases
+//    }
+    
+    
+    private var newToppingsSecosDisponibles: [ModelList.Toppings.SaboresSecos]{
+        guard productName == .paletas else {
+           return ModelList.Toppings.SaboresSecos.allCases
+        }
+        switch selectTypePaleta {
+        case .agua:
+            return [.panditas, .gomitas, .manguitos,.ninguno]
+  
+        case .crema:
+        //2.- Creo el set(conjunto) para la búsqueda de los toppings
+            let exclude: Set<ModelList.Toppings.SaboresSecos> = [
+                .panditas,
+                .gomitas,
+                .manguitos]
+        //3.- Devuelvo el arreglo, filtrándolo y excluyendo lo que contiene: "exclude"
+            return ModelList.Toppings.SaboresSecos.allCases.filter{
+                !exclude.contains($0)
+            }
+        }
+    }
+    
     
     var body: some View {
         HStack(alignment: .center, spacing: 12){
@@ -111,6 +156,18 @@ struct RowCard: View {
                     
                     
                 }
+                // IMPLEMENTAR BOLAS DE NIEVE
+                HStack(){
+                    Text("Bolas de nieve")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+               //     DryToppingsPicker
+                    
+                    
+                }
+                
+                
 
             }
             .padding(.vertical,8)
@@ -172,6 +229,7 @@ struct RowCard: View {
     
     @ViewBuilder
     var LiquidToppingsPicker: some View {
+        //MARK: - VALIDACION PALETAS DE AGUA
         if productName == .paletas && selectTypePaleta == .agua {
             Picker("", selection: $selectecPaletaToppingLiquidi){
                 ForEach(ModelList.Paletas.ToppingsPaletasAgua.allCases, id: \.self) { paletaL in
@@ -204,9 +262,11 @@ struct RowCard: View {
     }
 
     @ViewBuilder
+    //MARK: - VALIDACION PALETAS DE CREMA
+
     var DryToppingsPicker: some View {
         Picker("", selection: $selectecTypeToppingsSecos) {
-            ForEach(toppingsSecosDisponibles, id: \.self) { secos in
+            ForEach(newToppingsSecosDisponibles, id: \.self) { secos in
                 Text(secos.rawValue).tag(secos)
             }
         }
@@ -215,10 +275,10 @@ struct RowCard: View {
         .minimumScaleFactor(0.8)
         // Se recalibra la opción seleccionada al cambiar a Paleta de Agua
         .onChange(of: selectTypePaleta){ _, new in
-            if productName == .paletas && new == .agua{
-                if !toppingsSecosDisponibles.contains(selectecTypeToppingsSecos) {
-                    selectecTypeToppingsSecos = .panditas
-                            }
+            if productName == .paletas{
+                if !newToppingsSecosDisponibles.contains(selectecTypeToppingsSecos) {
+                    selectecTypeToppingsSecos = newToppingsSecosDisponibles.first ?? .ninguno
+              }
             }
             
         }
@@ -246,6 +306,7 @@ struct RowCard: View {
 // bola 1
 //bola 2 = valor default ninguno
 
+////quitar panditas, gomitas, manguitos en topping secos de crema
 
 
 /*

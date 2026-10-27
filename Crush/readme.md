@@ -4,13 +4,13 @@
 ### Administrar y gestionar las ventas de productos y analizar las métricas
 
 # Fase 1:
-* Implementar taps
-* Número de vistas
-* Enums
-
-
+* Implementar taps- ok
+* Número de vistas -ok
+* Enums- ok
 # Fase 2:
-* Modelo
+* Modelo - ok
 
+### Pendientes:
+#### 1.-Quitar panditas, gomitas, manguitos en topping secos de crema
 
 
