@@ -8,219 +8,174 @@
 import Foundation
 import SwiftUI
 
+// MARK: - Wrapper de Sabores
+enum SaborPaleta: Hashable, Identifiable {
+    case agua(ModelList.Paletas.SaborPaletasAgua)
+    case crema(ModelList.Paletas.SaborPaletasCrema)
+    
+    var id: String {
+        switch self {
+        case .agua(let sabor): return "agua_\(sabor.rawValue)"
+        case .crema(let sabor): return "crema_\(sabor.rawValue)"
+        }
+    }
+    
+    var tipoPaleta: ModelList.Paletas {
+        switch self {
+        case .agua: return .agua
+        case .crema: return .crema
+        }
+    }
+}
 
-//
-//  InicioViewModel.swift
-//  Crush
-//
-//  Created by GuillermoChaconAlcala on 16/10/26.
-//
-
-import Foundation
-import SwiftUI
-
-
-struct RowModelCard: Identifiable{
+// MARK: - Model
+struct RowModelCard: Identifiable {
     let id = UUID()
     let productName: ModelList.Producto
     let img: ImageResource
-    let isSheet : ActiveSheets
+    let isSheet: ActiveSheets
     let width: CGFloat
     let height: CGFloat
-    
 }
 
-
+// MARK: - View
 struct RowCard: View {
     let productName: ModelList.Producto
     let recurso: ImageResource
     let width: CGFloat
     let height: CGFloat
-    let action : () -> Void
+    let action: () -> Void
+    
+    // Estados activos de la vista
+    @State private var selectedSaborPaleta: SaborPaleta = .agua(.limon)
     @State private var selectedType: ModelList.TiposWaffle = .sencillo
     @State private var selectecTypeToppingsLiquidos: ModelList.Toppings.SaboresLiquidos = .ninguno
     @State private var selectecTypeToppingsSecos: ModelList.Toppings.SaboresSecos = .ninguno
-    
     @State private var selectecPaletaToppingLiquidi: ModelList.Paletas.ToppingsPaletasAgua = .chamoy
-    @State private var selectTypePaleta : ModelList.Paletas = .agua
-    
+    @State private var selectTypePaleta: ModelList.Paletas = .agua
     @State private var selectTypeFrappe: ModelList.TamanoFrappe = .normal
-    @State private var isDisabled: Bool = false
     
-    //Exceptio cuando la paleta sea crema y seleccione sabores líquidos
+    // Toppings líquidos según tipo de paleta
     private var toppingsLiquidosDisponibles: [ModelList.Toppings.SaboresLiquidos] {
         if productName == .paletas && selectTypePaleta == .crema {
-            return [.nutella,.mermelada,.lechera,.cajeta,.ninguno]
+            return [.nutella, .mermelada, .lechera, .cajeta, .ninguno]
         }
         return ModelList.Toppings.SaboresLiquidos.allCases
     }
     
-    
-    //Exceptio cuando la paleta sea agua y seleccione sabores secos
-    private var toppingsSecosDisponibles: [ModelList.Toppings.SaboresSecos] {
-        if productName == .paletas && selectTypePaleta == .agua {
-            return [.panditas, .gomitas, .manguitos, .ninguno]
-        }
-        return ModelList.Toppings.SaboresSecos.allCases
-    }
-    
-    //MARK: - EXCEPTION: CUANDO LA PALETA SEA DE CREMA: QUITAR LOS SIGUIENTES TOPPINGS: panditas, gomitas, manguitos
-//    private var test_ExcludeToppingsSecosPaletaCrema: [ModelList.Toppings.SaboresSecos]{
-//        
-//        //1.- Condiciono solo para paletas y tipo crema
-//        if productName == .paletas && selectTypePaleta == .crema{
-//            
-//        //2.- Creo el set(conjunto) para la búsqueda de los toppings
-//            let exclude: Set<ModelList.Toppings.SaboresSecos> = [
-//                .panditas,
-//                .gomitas,
-//                .manguitos]
-//        //3.- Devuelvo el arreglo, filtrándolo y excluyendo lo que contiene: "exclude"
-//            return ModelList.Toppings.SaboresSecos.allCases.filter{
-//                !exclude.contains($0)
-//            }
-//
-//        }
-//        // 4.- Regreso la lista de Toppings Secos ya filtrada
-//        return ModelList.Toppings.SaboresSecos.allCases
-//    }
-    
-    
-    private var newToppingsSecosDisponibles: [ModelList.Toppings.SaboresSecos]{
+    // Toppings secos según tipo de paleta
+    private var newToppingsSecosDisponibles: [ModelList.Toppings.SaboresSecos] {
         guard productName == .paletas else {
-           return ModelList.Toppings.SaboresSecos.allCases
+            return ModelList.Toppings.SaboresSecos.allCases
         }
         switch selectTypePaleta {
         case .agua:
-            return [.panditas, .gomitas, .manguitos,.ninguno]
-  
+            return [.panditas, .gomitas, .manguitos, .ninguno]
+            
         case .crema:
-        //2.- Creo el set(conjunto) para la búsqueda de los toppings
-            let exclude: Set<ModelList.Toppings.SaboresSecos> = [
-                .panditas,
-                .gomitas,
-                .manguitos]
-        //3.- Devuelvo el arreglo, filtrándolo y excluyendo lo que contiene: "exclude"
-            return ModelList.Toppings.SaboresSecos.allCases.filter{
+            let exclude: Set<ModelList.Toppings.SaboresSecos> = [.panditas, .gomitas, .manguitos]
+            return ModelList.Toppings.SaboresSecos.allCases.filter {
                 !exclude.contains($0)
             }
         }
     }
     
-    
     var body: some View {
-        HStack(alignment: .center, spacing: 12){
-            Button(action:action){
+        HStack(alignment: .center, spacing: 12) {
+            Button(action: action) {
                 Image(recurso)
-                .resizable()
-                .scaledToFit()
-                .frame(width: width,height: height)
-             //   .frame(width: 110,height: 110)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-
-            }.buttonStyle(.plain)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: width, height: height)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
             
-
-            VStack(alignment: .leading,spacing: 12){
+            VStack(alignment: .leading, spacing: 12) {
                 Text(productName.rawValue)
                     .font(.title3)
                     .bold()
+                
                 Divider()
                 
-                HStack{
-                    Text("Tipos")
+                HStack {
+                    Text("Sabor")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Spacer()
-                    //MARK: -  Validando Paleta
                     ValidationType
-                    
-                }//hstack
-                HStack(){ // probando
+                }
+                
+                HStack {
                     Text("T/liquidos")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Spacer()
-                    //MARK: - VALIDANDO TOPPING LIQUIDO
                     LiquidToppingsPicker
-                    
-                    
                 }
                 
-                HStack(){
+                HStack {
                     Text("T/secos")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Spacer()
                     DryToppingsPicker
-                    
-                    
                 }
-                // IMPLEMENTAR BOLAS DE NIEVE
-                HStack(){
-                    Text("Bolas de nieve")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-               //     DryToppingsPicker
-                    
-                    
-                }
-                
-                
-
             }
-            .padding(.vertical,8)
+            .padding(.vertical, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-                // 🔹 1. Padding mayor para dar más aire alrededor del contenido
-                .padding(7)
-                // 🔹 2. Altura mínima garantizada para que entren todos los controles
-                .frame(minHeight: 190)
-                // 🔹 3. Fondo relleno con sombra suave y borde
-                
-                .background(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(Color(.secondarySystemGroupedBackground))
-                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                )
+        .padding(7)
+        .frame(minHeight: 190)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(.secondarySystemGroupedBackground))
+                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
     }
     
+    // MARK: - Pickers
     @ViewBuilder
-    var ValidationType: some View{
-        //MARK: -  Validando Paleta
-        
-        if productName == .paletas{
-            Picker("", selection: $selectTypePaleta){
-                ForEach(ModelList.Paletas.allCases, id: \.self) { tipoPaleta in
-                    Text(tipoPaleta.rawValue).tag(tipoPaleta)
+    var ValidationType: some View {
+        if productName == .paletas {
+            Picker("", selection: $selectedSaborPaleta) {
+                Section("Paletas de Agua") {
+                    ForEach(ModelList.Paletas.SaborPaletasAgua.allCases, id: \.self) { sabor in
+                        Text(sabor.rawValue).tag(SaborPaleta.agua(sabor))
+                    }
                 }
                 
-            }.pickerStyle(.menu)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                Section("Paletas de Crema") {
+                    ForEach(ModelList.Paletas.SaborPaletasCrema.allCases, id: \.self) { sabor in
+                        Text(sabor.rawValue).tag(SaborPaleta.crema(sabor))
+                    }
+                }
+            }
+            .pickerStyle(.menu)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .onChange(of: selectedSaborPaleta) { _, nuevoSabor in
+                self.selectTypePaleta = nuevoSabor.tipoPaleta
+            }
             
-            //MARK: -  Validando Waffle
-            
-        }else if productName == .waffles{
-            Picker("", selection: $selectedType){
+        } else if productName == .waffles {
+            Picker("", selection: $selectedType) {
                 ForEach(ModelList.TiposWaffle.allCases, id: \.self) { opcion in
                     Text(opcion.rawValue).tag(opcion)
                 }
             }
             .labelsHidden()
             .pickerStyle(.menu)
-        } else{
-            //MARK: -  Validando Frappe
-            Picker("", selection: $selectTypeFrappe){
+            
+        } else {
+            Picker("", selection: $selectTypeFrappe) {
                 ForEach(ModelList.TamanoFrappe.allCases, id: \.self) { frappe in
                     Text(frappe.rawValue).tag(frappe)
                 }
-             
             }
             .labelsHidden()
             .pickerStyle(.menu)
@@ -229,9 +184,8 @@ struct RowCard: View {
     
     @ViewBuilder
     var LiquidToppingsPicker: some View {
-        //MARK: - VALIDACION PALETAS DE AGUA
         if productName == .paletas && selectTypePaleta == .agua {
-            Picker("", selection: $selectecPaletaToppingLiquidi){
+            Picker("", selection: $selectecPaletaToppingLiquidi) {
                 ForEach(ModelList.Paletas.ToppingsPaletasAgua.allCases, id: \.self) { paletaL in
                     Text(paletaL.rawValue).tag(paletaL)
                 }
@@ -239,10 +193,9 @@ struct RowCard: View {
             .pickerStyle(.menu)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
-          //  .disabled(productName == .paletas && selectTypePaleta == .crema)
             
         } else {
-            Picker("", selection: $selectecTypeToppingsLiquidos){
+            Picker("", selection: $selectecTypeToppingsLiquidos) {
                 ForEach(toppingsLiquidosDisponibles, id: \.self) { topping in
                     Text(topping.rawValue).tag(topping)
                 }
@@ -250,20 +203,17 @@ struct RowCard: View {
             .pickerStyle(.menu)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
-            // Recalibra la selección al cambiar a Paleta de Crema si el sabor actual no está en la lista reducida
-                    .onChange(of: selectTypePaleta) { _, newType in
-                        if productName == .paletas && newType == .crema {
-                            if !toppingsLiquidosDisponibles.contains(selectecTypeToppingsLiquidos) {
-                                selectecTypeToppingsLiquidos = .cajeta
-                            }
-                        }
+            .onChange(of: selectTypePaleta) { _, newType in
+                if productName == .paletas && newType == .crema {
+                    if !toppingsLiquidosDisponibles.contains(selectecTypeToppingsLiquidos) {
+                        selectecTypeToppingsLiquidos = .cajeta
                     }
+                }
+            }
         }
     }
 
     @ViewBuilder
-    //MARK: - VALIDACION PALETAS DE CREMA
-
     var DryToppingsPicker: some View {
         Picker("", selection: $selectecTypeToppingsSecos) {
             ForEach(newToppingsSecosDisponibles, id: \.self) { secos in
@@ -273,18 +223,14 @@ struct RowCard: View {
         .pickerStyle(.menu)
         .lineLimit(1)
         .minimumScaleFactor(0.8)
-        // Se recalibra la opción seleccionada al cambiar a Paleta de Agua
-        .onChange(of: selectTypePaleta){ _, new in
-            if productName == .paletas{
+        .onChange(of: selectTypePaleta) { _, _ in
+            if productName == .paletas {
                 if !newToppingsSecosDisponibles.contains(selectecTypeToppingsSecos) {
                     selectecTypeToppingsSecos = newToppingsSecosDisponibles.first ?? .ninguno
-              }
+                }
             }
-            
         }
     }
-}
-#Preview {
 }
 
 /*

@@ -100,7 +100,7 @@ class ModelList{
             case chispas = "Chispas"
             case nuez = "Nuez"
             case almendra = "Almendra"
-            case emanens = "m&m"
+            case emanens = "M&m"
             case kranquis = "Kranquis"
             case chocoretas = "Chocoretas"
             case panditas = "Panditas"
@@ -119,22 +119,23 @@ class ModelList{
         
         var id: Self{self}
         
-        enum PaletasAgua: String, CaseIterable, Identifiable{
+        enum SaborPaletasAgua: String, CaseIterable, Identifiable{
             case mango = "Mango"
             case piña = "Piña"
-            case fresa = "Fresa"
+            case limon = "Limón"
             
             var id: Self{self}
             
-            enum PaletasCrema: String, CaseIterable, Identifiable{
-                case cacahuate = "Cacahuate"
-                case pistace = "Pistache"
-                case fresa = "Fresa"
-                case chocolate = "Chocolate"
-                case oreo = "Oreo"
-                
-                var id: Self{self}
-            }
+           
+        }
+        enum SaborPaletasCrema: String, CaseIterable, Identifiable{
+            case cacahuate = "Cacahuate"
+            case pistace = "Pistache"
+            case fresa = "Fresa"
+            case chocolate = "Chocolate"
+            case oreo = "Oreo"
+            
+            var id: Self{self}
         }
         
         enum ToppingsPaletasAgua: String, CaseIterable, Identifiable{
@@ -163,6 +164,15 @@ class ModelList{
         case mango = "Mango"
         var id: Self{self}
     }
+    
+    enum BolasDeNieve: String, CaseIterable, Identifiable{
+        case cero = "0"
+        case uno = "1"
+        case dos = "2"
+        var id: Self{self}
+        
+    }
+    
     
     
     

@@ -5,6 +5,7 @@ enum TabsController:String, CaseIterable, Identifiable,Hashable{
     case incio = "Inicio"
     case ventas = "Ventas"
     case inventario = "Inventario"
+    case carrito = "Carrito"
     var id: String{rawValue}
     
     var icons:String{
@@ -12,6 +13,7 @@ enum TabsController:String, CaseIterable, Identifiable,Hashable{
         case .incio : "house"
         case .ventas: "creditcard"
         case .inventario: "chart.bar.xaxis.ascending"
+        case .carrito : "cart"
         }
     }
     
@@ -24,6 +26,8 @@ enum TabsController:String, CaseIterable, Identifiable,Hashable{
             VentasView()
         case .inventario:
             InventarioView()
+        case .carrito:
+            EmptyView()
         }
     }
     
