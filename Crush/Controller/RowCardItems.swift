@@ -47,13 +47,16 @@ struct RowCard: View {
     let action: () -> Void
     
     // Estados activos de la vista
+    @State private var bolasNieve: ModelList.BolasDeNieve = .cero
     @State private var selectedSaborPaleta: SaborPaleta = .agua(.limon)
-    @State private var selectedType: ModelList.TiposWaffle = .sencillo
+    @State private var selectedType: ModelList.TiposWaffle = .normal
     @State private var selectecTypeToppingsLiquidos: ModelList.Toppings.SaboresLiquidos = .ninguno
     @State private var selectecTypeToppingsSecos: ModelList.Toppings.SaboresSecos = .ninguno
     @State private var selectecPaletaToppingLiquidi: ModelList.Paletas.ToppingsPaletasAgua = .chamoy
     @State private var selectTypePaleta: ModelList.Paletas = .agua
     @State private var selectTypeFrappe: ModelList.TamanoFrappe = .normal
+    @State private var saborFrappe: ModelList.SaborFrappe = .moka
+    @State private var tamanoFrappe: ModelList.TamanoFrappe = .grande
     
     // Toppings líquidos según tipo de paleta
     private var toppingsLiquidosDisponibles: [ModelList.Toppings.SaboresLiquidos] {
@@ -98,29 +101,65 @@ struct RowCard: View {
                 
                 Divider()
                 
-                HStack {
-                    Text("Sabor")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    ValidationType
-                }
+                HStack { //refactorizar a switch
+                    if productName == .waffles{
+                        Text("Tipo")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        ValidationType
+                    }
+                    
+                    if productName == .paletas{
+                        Text("Sabor")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        ValidationType
+                    }else if productName == .frappes{
+                        Text("Sabor")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        SaborFrappes
+                    }
+                    
+                        }
                 
+                HStack{
+                    if productName == .frappes{
+                        Text("Tamaño")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        TamanoFrappe
+                    }
+                    if productName == .waffles{
+                        Text("Bolas")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        BolasNieve
+                    }
+                    
+                        }
+                    
                 HStack {
                     Text("T/liquidos")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Spacer()
                     LiquidToppingsPicker
-                }
-                
-                HStack {
+                            }
+                    
+                          HStack {
                     Text("T/secos")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Spacer()
                     DryToppingsPicker
                 }
+            
             }
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -170,10 +209,21 @@ struct RowCard: View {
             }
             .labelsHidden()
             .pickerStyle(.menu)
+            .onChange(of: selectedType){_, newType in
+                switch newType{
+                case .normal:
+                    bolasNieve = .cero
+                case .sencillo:
+                    bolasNieve = .uno
+                case .doble:
+                    bolasNieve = .dos
+                }
+                
+            }
             
         } else {
-            Picker("", selection: $selectTypeFrappe) {
-                ForEach(ModelList.TamanoFrappe.allCases, id: \.self) { frappe in
+            Picker("", selection: $saborFrappe) {
+                ForEach(ModelList.SaborFrappe.allCases, id: \.self) { frappe in
                     Text(frappe.rawValue).tag(frappe)
                 }
             }
@@ -212,7 +262,7 @@ struct RowCard: View {
             }
         }
     }
-
+    
     @ViewBuilder
     var DryToppingsPicker: some View {
         Picker("", selection: $selectecTypeToppingsSecos) {
@@ -231,7 +281,55 @@ struct RowCard: View {
             }
         }
     }
+    
+    @ViewBuilder
+    private var BolasNieve: some View{
+        if selectedType == .normal{
+            Picker("",selection: $bolasNieve){
+                ForEach(ModelList.BolasDeNieve.allCases,id: \.self){ normal in
+                    Text(normal.rawValue).tag(normal)
+                }
+            }
+            .pickerStyle(.menu)
+            .disabled(selectedType == .normal)
+            
+        }else if selectedType == .sencillo{
+            Picker("",selection: $bolasNieve){
+                ForEach(ModelList.BolasDeNieve.allCases.filter({$0 == .uno}),id: \.self){ sencillo in
+                    Text(sencillo.rawValue).tag(sencillo)
+                }
+            }.pickerStyle(.menu)
+        } else if selectedType == .doble{
+            Picker("",selection: $bolasNieve){
+                ForEach(ModelList.BolasDeNieve.allCases.filter({$0 == .dos}),id: \.self){ doble in
+                    Text(doble.rawValue).tag(doble)
+                }
+            }.pickerStyle(.menu)
+        }
+    }
+    
+    @ViewBuilder
+    private var TamanoFrappe: some View{
+        Picker("",selection: $tamanoFrappe){
+            ForEach(ModelList.TamanoFrappe.allCases,id:\.self){ tamano in
+                Text(tamano.rawValue).tag(tamano)
+                
+            }
+        }
+        
+    }
+    
+    @ViewBuilder
+    private var SaborFrappes: some View{
+        Picker("", selection: $saborFrappe){
+            ForEach(ModelList.SaborFrappe.allCases){ sabores in
+                Text(sabores.rawValue).tag(sabores)
+                
+            }
+        }.pickerStyle(.menu)
+    }
 }
+
 
 /*
   waffle normal es el puro pan, solo puede llevar topping líquido y seco.
@@ -275,3 +373,13 @@ struct RowCard: View {
      .disabled(esPaletaDeAgua)
  }
  */
+
+
+// sabor de frappe: tradicional, moka, oreo, nutella = ok
+//tamaño ok
+
+
+// para waffle es tipo: normal , sencillo, doble = ok
+// el normal no permite seleccionar ninguna bola de helado = ok
+// falta poder seleccionar una bola para sencillo y dos bolas para doble
+//pendiente arraglar lógica del onchange de los waffles en validationType

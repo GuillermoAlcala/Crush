@@ -152,6 +152,7 @@ class ModelList{
     
     enum TamanoFrappe: String, CaseIterable, Identifiable{
         case normal = "Normal"
+        case sencillo = "Sencillo"
         case grande = "Grande"
         var id: Self{self}
     }
@@ -166,14 +167,22 @@ class ModelList{
     }
     
     enum BolasDeNieve: String, CaseIterable, Identifiable{
-        case cero = "0"
-        case uno = "1"
-        case dos = "2"
-        var id: Self{self}
+        case cero = "Sin bola"
+        case uno = "1" // si el waffle  es sencilla una bola
+        case dos = "2" // si el waffle  es doble, dos bolas
+        var id: String{rawValue}
         
     }
     
+    enum SaborFrappe: String,CaseIterable, Identifiable{
+        case tradicional = "Tradicional"
+        case moka = "Moka"
+        case oreo = "Oreo"
+        case nutella = "Nutella"
+        var id: Self{self}
+
     
+    }
     
     
 }
