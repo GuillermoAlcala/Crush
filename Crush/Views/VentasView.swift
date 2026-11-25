@@ -114,7 +114,7 @@ struct VentasView: View {
         List{
             Section("Tickets Registrados (\(ventasFiltradas.count))"){
                 ForEach(ventasFiltradas){ val in
-                    NavigationLink(destination: TicketDetailView()){
+                    NavigationLink(destination: Test_DetalleTicketView(venta: val)){
                         HStack{
                         VStack(alignment: .leading, spacing: 4){
                             Text(val.folio)
@@ -140,9 +140,10 @@ struct VentasView: View {
     }
 }
 
-#Preview {
-    VentasView()
-}
+//#Preview {
+//    VentasView()
+//}
+
 
 
 /*
