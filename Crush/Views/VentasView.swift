@@ -114,7 +114,7 @@ struct VentasView: View {
         List{
             Section("Tickets Registrados (\(ventasFiltradas.count))"){
                 ForEach(ventasFiltradas){ val in
-                //    NavigationLink(destination: TicketDetailView()){
+                    NavigationLink(destination: TicketDetailView()){
                         HStack{
                         VStack(alignment: .leading, spacing: 4){
                             Text(val.folio)
@@ -132,7 +132,7 @@ struct VentasView: View {
                         }
                         
                         
-             //       } //link
+                    } //link
                 }
             }
             .listStyle(.insetGrouped)
